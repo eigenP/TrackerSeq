@@ -5,6 +5,9 @@ R2=$4
 sample=$5
 expect=$6
 
+### A. Fail fast on errors
+set -euo pipefail
+
 ### 1.Trimming and selecting
 # Replace in1 and in2 with your R1 and R2 of your retrieved barcode file
 bbduk.sh in=$datadir/$R1 in2=$datadir/$R2 k=17 literal=GACTCTGGCTCACAAAT  ktrim=r out=stdout.fq int=f skipr1 maq=15 overwrite=t|\
@@ -25,7 +28,8 @@ umi_tools whitelist --stdin $datadir/$R1 \
         --bc-pattern=CCCCCCCCCCCCCCCCNNNNNNNNNN \
         --plot-prefix=${sample}_expect_whitelist \
         --log2stderr > $output/${sample}_whitelist.txt \
-        --allow-threshold-error
+        --allow-threshold-error \
+        --set-cell-number $expect
 
 ### 4. Add the cell barcodes from step 3 to R2 reads 
 
