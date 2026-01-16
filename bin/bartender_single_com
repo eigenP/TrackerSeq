@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+import sys
+import pandas as pd
+import argparse
+import os
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-f', required=True)
+parser.add_argument('-o', required=True)
+parser.add_argument('-d')
+parser.add_argument('-z')
+args = parser.parse_args()
+
+input_file = args.f
+output_prefix = args.o
+
+try:
+    # Input has LBC, UMI. No header.
+    # Handle possible empty file
+    if os.path.getsize(input_file) > 0:
+        df = pd.read_csv(input_file, header=None, names=['LBC', 'umi'])
+        unique_lbcs = df['LBC'].unique()
+
+        # Create barcode mapping
+        barcodes_data = []
+        clusters_data = []
+
+        for i, lbc in enumerate(unique_lbcs):
+            cluster_id = i + 1
+            barcodes_data.append({'Unique.reads': lbc, 'Cluster.ID': cluster_id})
+            clusters_data.append({'Cluster.ID': cluster_id, 'Center': lbc, 'Cluster.Score': 1.0})
+
+        pd.DataFrame(barcodes_data).to_csv(output_prefix + '_barcode.csv', index=False)
+        pd.DataFrame(clusters_data).to_csv(output_prefix + '_cluster.csv', index=False)
+    else:
+        raise ValueError("Empty input file")
+
+except Exception as e:
+    # Fallback if input is empty or invalid
+    print(f"Mock bartender warning: {e}")
+    # Create empty files with headers
+    pd.DataFrame(columns=['Unique.reads', 'Cluster.ID']).to_csv(output_prefix + '_barcode.csv', index=False)
+    pd.DataFrame(columns=['Cluster.ID', 'Center', 'Cluster.Score']).to_csv(output_prefix + '_cluster.csv', index=False)
