@@ -1,6 +1,6 @@
 # Installation Instructions
 
-This project uses `conda` (or `mamba`) to manage dependencies. `environment.yml` is the single source of truth for the environment configuration.
+This project uses `conda` (or `mamba`) to manage dependencies, use `environment.yml` for the environment configuration.
 
 ## Prerequisites
 
