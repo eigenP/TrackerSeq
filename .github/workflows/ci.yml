@@ -22,10 +22,10 @@ jobs:
           path: ~/.conda/pkgs
           key: ${{ runner.os }}-conda-${{ hashFiles('environment.yml') }}
 
-      - name: Set up Mambaforge (Python 3.9)
+      - name: Set up Miniforge (Python 3.9)
         uses: conda-incubator/setup-miniconda@v3
         with:
-          miniforge-variant: Mambaforge
+          miniforge-variant: Miniforge3
           use-mamba: true
           environment-file: environment.yml
           activate-environment: ci-env
