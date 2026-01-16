@@ -37,6 +37,22 @@ jobs:
           python --version
           conda list
 
+      - name: Install Bartender 1.1
+        run: |
+          # Clone and compile Bartender
+          git clone https://github.com/LaoZZZZZ/bartender-1.1.git
+          cd bartender-1.1
+          make
+
+          # Install binaries to a location in PATH (using Conda's bin for convenience)
+          # $CONDA_PREFIX/bin is active because of shell: bash -l {0}
+          echo "Installing bartender binaries to $CONDA_PREFIX/bin"
+          cp bartender_single* $CONDA_PREFIX/bin/
+
+          # cleanup
+          cd ..
+          rm -rf bartender-1.1
+
       - name: Verify external dependencies
         run: |
           samtools --version
