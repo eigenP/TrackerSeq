@@ -2,7 +2,13 @@
 set -e
 
 # Setup environment
-export PATH=$PWD/bin:$PATH
+# Only add local bin to PATH if bbduk.sh is not in system PATH
+if ! command -v bbduk.sh &> /dev/null; then
+    echo "External tools not found in PATH. Using mocks in ./bin"
+    export PATH=$PWD/bin:$PATH
+else
+    echo "Using external tools found in PATH"
+fi
 
 # Define variables
 DATADIR=$PWD/data

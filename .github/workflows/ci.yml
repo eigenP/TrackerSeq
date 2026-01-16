@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0} # critical for conda activation
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Optional but recommended: cache conda pkgs
+      - name: Cache conda packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.conda/pkgs
+          key: ${{ runner.os }}-conda-${{ hashFiles('environment.yml') }}
+
+      - name: Set up Mambaforge (Python 3.9)
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniforge-variant: Mambaforge
+          use-mamba: true
+          environment-file: environment.yml
+          activate-environment: ci-env
+          auto-activate-base: false
+
+      - name: Debug environment
+        run: |
+          which python
+          python --version
+          conda list
+
+      - name: Verify external dependencies
+        run: |
+          samtools --version
+          # bbmap package provides bbduk.sh. Version output goes to stderr.
+          bbduk.sh --version || true
+          # bartender check.
+          if command -v bartender_single_com &> /dev/null; then
+              bartender_single_com --help | head -n 10
+          elif command -v bartender &> /dev/null; then
+              bartender --help | head -n 10
+          else
+              echo "Bartender not found!"
+              exit 1
+          fi
+          java -version
+
+      - name: Run test suite
+        run: |
+          pytest -v --disable-warnings
