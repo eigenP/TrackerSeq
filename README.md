@@ -28,7 +28,7 @@ Previous major versions
   * Levenshtein
 
 ## NGS library design
-![TrackerSeq_seqstrategy](TrackerSeq_seqstrategy.pdf)
+![TrackerSeq_seqstrategy](docs/TrackerSeq_seqstrategy.pdf)
 
 ## TrackerSeq processing pipeline steps
 
