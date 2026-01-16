@@ -1,0 +1,23 @@
+name: ci-env
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  # --- Python ---
+  - python=3.9
+  - pip
+  - pytest
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  - seaborn
+  - networkx
+  - python-levenshtein
+  - umi_tools
+  # --- Bioinformatics tools ---
+  - samtools
+  - bbmap
+  # --- Java (explicit, avoids surprises) ---
+  - openjdk=17
