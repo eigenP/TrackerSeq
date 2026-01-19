@@ -91,6 +91,20 @@ barcode_df_for_bartender = clean_barcode_df_to_csv[['LBC', 'umi']]
 np.savetxt(REFORMATTED_FASTA + '_for_bartender.csv', barcode_df_for_bartender, delimiter=",", fmt='%s')
 
 
+barcode_df_for_bartender_counts = (
+    clean_barcode_df_to_csv
+    .groupby('LBC')
+    .size()
+    .reset_index(name='count')
+)
+
+barcode_df_for_bartender_counts.to_csv(
+    REFORMATTED_FASTA + '_for_bartender_counts.csv',
+    index=False,
+    header=False
+)
+
+
 
 
 
