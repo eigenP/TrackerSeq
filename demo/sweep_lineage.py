@@ -127,7 +127,7 @@ if not metrics_df.empty:
 
     # Adjust layout
     plt.tight_layout()
-    plot_path = os.path.join(OUTPUT_DIR, "sweep_results.png")
+    plot_path = os.path.join(OUTPUT_DIR, "4_1_lineage_analysis_sweep_results.png")
     plt.savefig(plot_path)
     print(f"Plots saved to {plot_path}")
 
