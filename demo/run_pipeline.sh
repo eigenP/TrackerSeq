@@ -4,19 +4,8 @@ set -e
 # Get the directory of the script
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 TRACKERSEQ_DIR="$SCRIPT_DIR/../TrackerSeq"
-BIN_DIR="$SCRIPT_DIR/../bin"
-
 # Change to the script directory so that artifacts (like plots) are generated in demo/
 cd "$SCRIPT_DIR"
-
-# Setup environment
-# Only add local bin to PATH if bbduk.sh is not in system PATH
-if ! command -v bbduk.sh &> /dev/null; then
-    echo "External tools not found in PATH. Using mocks in $BIN_DIR"
-    export PATH=$BIN_DIR:$PATH
-else
-    echo "Using external tools found in PATH"
-fi
 
 # Define variables
 DATADIR=$SCRIPT_DIR/data
@@ -56,6 +45,4 @@ popd > /dev/null
 echo "Pipeline finished successfully."
 
 # Note: Step 6 (R script) is skipped as per instructions.
-# Note: bbduk, repair, and bartender_single_com are MOCKED in ./bin/
-# Please ensure real tools are installed and tested in a production environment.
 # Note: Add the python notebook for Step 6 later.
