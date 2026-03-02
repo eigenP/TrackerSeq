@@ -17,19 +17,24 @@ BARTENDER_CLUSTERS_PCR = str(sys.argv[4]) # input cluster centers and quality sc
 # OUTPUTS
 CLONE_MAT_CSV = str(sys.argv[5])+'.csv' # output for cell - lineage barcode matrix in csv
 CLONE_MAT_NPY = str(sys.argv[5])+'.npy' # output for cell - lineage barcode matrix in native npy
-LBC_TXT = str(sys.argv[6]) + '_LBC_list.txt' # output for lineage barcode sequences as txt
-CBC_CSV = str(sys.argv[6]) + '_cellbc_list.csv'# output for lineage barcode sequences in csv
 BAR_MAP = str(sys.argv[6]) + '_barcode_map.npy' # ouptut for barcode mapping file
 
 N_READS = int(sys.argv[7])
 N_UMIS = int(sys.argv[8])
+
+if len(sys.argv) > 9:
+    LBC_TXT = str(sys.argv[9]) + '_LBC_list.txt' # output for lineage barcode sequences as txt
+    CBC_CSV = str(sys.argv[9]) + '_cellbc_list.csv'# output for lineage barcode sequences in csv
+else:
+    LBC_TXT = str(sys.argv[6]) + '_LBC_list.txt' # output for lineage barcode sequences as txt
+    CBC_CSV = str(sys.argv[6]) + '_cellbc_list.csv'# output for lineage barcode sequences in csv
 N_HAMMING = 5 
 SMALL_DATASET = False
 CLUSTER_QUALITY_CUTOFF = 0.8
 
 
 # cell_bcs = open(CELL_BCS_PATH).read().strip('\n').split('\n') #if the barcode is extracted from Seurat object
-cell_bcs = pd.read_csv(CELL_BCS_PATH, sep='\t', header = None)
+cell_bcs = pd.read_csv(CELL_BCS_PATH, sep='\t', header = None, on_bad_lines='skip')
 cell_bcs = cell_bcs.loc[:,0].tolist()
 
 # if inputs are available, read in the bartender clustering file outputs (bartender_single_com) for collapsing low hamming distance barcodes
