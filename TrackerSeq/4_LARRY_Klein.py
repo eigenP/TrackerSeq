@@ -38,33 +38,37 @@ cell_bcs = pd.read_csv(CELL_BCS_PATH, sep='\t', header = None, on_bad_lines='ski
 cell_bcs = cell_bcs.loc[:,0].tolist()
 
 # if inputs are available, read in the bartender clustering file outputs (bartender_single_com) for collapsing low hamming distance barcodes
-if os.path.exists(BARTENDER_BARCODES_PCR):
-    bartender_barcodes = pd.read_csv(BARTENDER_BARCODES_PCR, sep=',', header = 'infer')
-if os.path.exists(BARTENDER_CLUSTERS_PCR):
-    bartender_clusters = pd.read_csv(BARTENDER_CLUSTERS_PCR, sep=',', header = 'infer')
+if os.path.exists(BAR_MAP):
+    print(f"Loading existing barcode map from {BAR_MAP}")
+    bartender_whitelist = np.load(BAR_MAP, allow_pickle=True).item()
+else:
+    if os.path.exists(BARTENDER_BARCODES_PCR):
+        bartender_barcodes = pd.read_csv(BARTENDER_BARCODES_PCR, sep=',', header = 'infer')
+    if os.path.exists(BARTENDER_CLUSTERS_PCR):
+        bartender_clusters = pd.read_csv(BARTENDER_CLUSTERS_PCR, sep=',', header = 'infer')
 
-# For each unique barcode in the bartender_barcodes file, match it with the barcode center sequence based on cluster id
-# This generates a whitelist (default hamming = 3) which can be used to map barcodes later in this pipeline step
-# This approach is superior than the current implementation in this pipeline for mapping barcodes since it uses umis and does iterative clustering
+    # For each unique barcode in the bartender_barcodes file, match it with the barcode center sequence based on cluster id
+    # This generates a whitelist (default hamming = 3) which can be used to map barcodes later in this pipeline step
+    # This approach is superior than the current implementation in this pipeline for mapping barcodes since it uses umis and does iterative clustering
 
-# Filter for quality threshold, -P*log2(P) - (1 - P)*log2(1-P) where P is the % majority sequence at each NT position
-# 0.5 is a decent default as this means ~9/10 instances of a barcode have a NT value in a given position
-# 0.8 would be 1/4
-# 0.9 1/3... 
-# likely doesnt matter below this level since umi filtering will remove anything below (1/N_UMI) and N_READS filtering will help as well
+    # Filter for quality threshold, -P*log2(P) - (1 - P)*log2(1-P) where P is the % majority sequence at each NT position
+    # 0.5 is a decent default as this means ~9/10 instances of a barcode have a NT value in a given position
+    # 0.8 would be 1/4
+    # 0.9 1/3...
+    # likely doesnt matter below this level since umi filtering will remove anything below (1/N_UMI) and N_READS filtering will help as well
 
-bartender_whitelist = {}
-for i, unique_bc in enumerate(bartender_barcodes['Unique.reads']): 
-    cluster = bartender_barcodes['Cluster.ID'][i]
-    cluster_quality = bartender_clusters['Cluster.Score'][bartender_clusters['Cluster.ID']==cluster].values[0]
-    if cluster_quality < CLUSTER_QUALITY_CUTOFF:
-        center = bartender_clusters['Center'][bartender_clusters['Cluster.ID']==cluster].values[0]
-        bartender_whitelist[unique_bc] = center
+    bartender_whitelist = {}
+    for i, unique_bc in enumerate(bartender_barcodes['Unique.reads']):
+        cluster = bartender_barcodes['Cluster.ID'][i]
+        cluster_quality = bartender_clusters['Cluster.Score'][bartender_clusters['Cluster.ID']==cluster].values[0]
+        if cluster_quality < CLUSTER_QUALITY_CUTOFF:
+            center = bartender_clusters['Center'][bartender_clusters['Cluster.ID']==cluster].values[0]
+            bartender_whitelist[unique_bc] = center
 
-print('\nWhitelist maps '+repr(len(set(bartender_whitelist.keys()))) + ' barcodes to ' +repr(len(set(bartender_whitelist.values()))) + ' barcodes')
+    print('\nWhitelist maps '+repr(len(set(bartender_whitelist.keys()))) + ' barcodes to ' +repr(len(set(bartender_whitelist.values()))) + ' barcodes')
 
-# Save the whitelist to the BAR_MAP output file
-np.save(BAR_MAP, bartender_whitelist)
+    # Save the whitelist to the BAR_MAP output file
+    np.save(BAR_MAP, bartender_whitelist)
 
 
 # Process reads into memory while checking for valid data
