@@ -14,14 +14,15 @@ SAMPLE="test_sample"
 R1="dummy_R1.fastq"
 R2="dummy_R2.fastq"
 EXPECT=5
+CHEMISTRY="v2" # using v2 because dummy data uses 10nt UMI
 
 mkdir -p $OUTPUT
 
 echo "Starting pipeline..."
 
 echo "--- Step 1: Preprocessing ---"
-# 1_preprocessing.sh datadir output R1 R2 sample expect
-bash $TRACKERSEQ_DIR/1_preprocessing.sh $DATADIR $OUTPUT $R1 $R2 $SAMPLE $EXPECT
+# 1_preprocessing.sh datadir output R1 R2 sample expect chemistry
+bash $TRACKERSEQ_DIR/1_preprocessing.sh $DATADIR $OUTPUT $R1 $R2 $SAMPLE $EXPECT $CHEMISTRY
 
 echo "--- Step 2: Reformat ---"
 # 2.1_reformat_caller.sh output fastq sample

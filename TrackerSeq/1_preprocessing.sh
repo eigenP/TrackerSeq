@@ -4,6 +4,22 @@ R1=$3
 R2=$4
 sample=$5
 expect=$6
+chemistry=${7:-}
+
+if [[ -z "$chemistry" ]]; then
+    echo "Error: chemistry argument required. Supported values: v2, v3, v4" >&2
+    echo "Hint: v2 uses a 10nt UMI, v3 and v4 use a 12nt UMI." >&2
+    exit 1
+fi
+
+if [[ "$chemistry" == "v2" ]]; then
+    bc_pattern="CCCCCCCCCCCCCCCCNNNNNNNNNN"
+elif [[ "$chemistry" == "v3" ]] || [[ "$chemistry" == "v4" ]]; then
+    bc_pattern="CCCCCCCCCCCCCCCCNNNNNNNNNNNN"
+else
+    echo "Error: unsupported chemistry '$chemistry'. Supported values: v2, v3, v4" >&2
+    exit 1
+fi
 
 ### A. Fail fast on errors
 set -euo pipefail
@@ -25,7 +41,7 @@ bbduk.sh in=$output/trim_R2.fastq out=stdout.fq minlength=37 maxlength=37 overwr
 # You may have to adjust the settings for umi_tools whitelist depending on the file for more info see: 
 # https://umi-tools.readthedocs.io/en/latest/reference/whitelist.html#whitelist-specific-options
 umi_tools whitelist --stdin $datadir/$R1 \
-        --bc-pattern=CCCCCCCCCCCCCCCCNNNNNNNNNN \
+        --bc-pattern=$bc_pattern \
         --plot-prefix=${sample}_expect_whitelist \
         --log2stderr > $output/${sample}_whitelist.txt \
         --allow-threshold-error \
@@ -33,7 +49,7 @@ umi_tools whitelist --stdin $datadir/$R1 \
 
 ### 4. Add the cell barcodes from step 3 to R2 reads 
 
-umi_tools extract --bc-pattern=CCCCCCCCCCCCCCCCNNNNNNNNNN \
+umi_tools extract --bc-pattern=$bc_pattern \
         --stdin $output/pair_R1.fastq \
         --stdout $output/pair_R1_extracted.fastq.gz \
         --read2-in $output/pair_R2.fastq \
