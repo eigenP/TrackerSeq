@@ -17,7 +17,7 @@ clone_mat = pd.read_csv(CLONE_MAT, on_bad_lines='skip', header = 0, index_col = 
 clone_mat_np = np.load(CLONE_NPY)
 # read in cell bc file
 # cell_bcs = open(CELL_BCS).read().strip('\n').split('\n') #use this to read in barcodes that are already in .txt file format
-cell_bcs = pd.read_csv(CELL_BCS, sep='\t', header = None)
+cell_bcs = pd.read_csv(CELL_BCS, sep='\t', header = None, on_bad_lines='skip')
 
 
 # examine dimensions of the matrix
